@@ -30,6 +30,34 @@ app.post('/signup', (req, res) => {
     })
 })
 
+app.get("/home", (req, res) => {
+    const q = "SELECT * FROM login";
+    db.query(q, (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.json(err);
+      }
+      return res.json(data);
+    });
+  });
+
+
+app.post('/login', (req, res) => {
+    const sql = "SELECT * FROM login WHERE `email` = ? AND `password` = ?";
+
+    db.query(sql, [req.body.email, req.body.password], (err, data) => {
+        if(err){
+            return res.json(err);
+        }
+        if(data.length > 0){
+            return res.json("Success");
+        }else{
+            return res.json("Failed");
+        }
+        
+    })
+})
+
 app.listen(8081, () => {
     console.log("Server started.");
 })
