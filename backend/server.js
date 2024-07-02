@@ -42,7 +42,7 @@ app.get("/home", (req, res) => {
   });
 
 
-app.post('/login', (req, res) => {
+/*app.post('/login', (req, res) => {
     const sql = "SELECT * FROM login WHERE `email` = ? AND `password` = ?";
 
     db.query(sql, [req.body.email, req.body.password], (err, data) => {
@@ -56,7 +56,38 @@ app.post('/login', (req, res) => {
         }
         
     })
-})
+})*/
+
+app.get('/user/:id', (req, res) => {
+    const sql = "SELECT * FROM login WHERE id = ?";
+    const id = req.params.id;
+
+    db.query(sql, [id], (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        if (data.length > 0) {
+            return res.json(data[0]);
+        } else {
+            return res.json({ status: "Failed" });
+        }
+    });
+});
+
+app.post('/login', (req, res) => {
+    const sql = "SELECT * FROM login WHERE `email` = ? AND `password` = ?";
+
+    db.query(sql, [req.body.email, req.body.password], (err, data) => {
+        if (err) {
+            return res.json(err);
+        }
+        if (data.length > 0) {
+            return res.json({ status: "Success", id: data[0].id });  // Return user ID
+        } else {
+            return res.json({ status: "Failed" });
+        }
+    });
+});
 
 app.listen(8081, () => {
     console.log("Server started.");
