@@ -59,7 +59,12 @@ app.get("/home", (req, res) => {
 })*/
 
 app.get('/user/:id', (req, res) => {
-    const sql = "SELECT * FROM login WHERE id = ?";
+    const sql = `
+        SELECT login.*, bills.id AS bill_id, bills.amount, bills.date 
+        FROM login 
+        LEFT JOIN bills ON login.id = bills.user_id 
+        WHERE login.id = ?`;
+
     const id = req.params.id;
 
     db.query(sql, [id], (err, data) => {
@@ -67,7 +72,18 @@ app.get('/user/:id', (req, res) => {
             return res.json(err);
         }
         if (data.length > 0) {
-            return res.json(data[0]);
+            const userInfo = {
+                id: data[0].id,
+                name: data[0].name,
+                email: data[0].email,
+                password: data[0].password,
+                bills: data.filter(row => row.bill_id !== null).map(row => ({
+                    id: row.bill_id,
+                    amount: row.amount,
+                    date: row.date
+                }))
+            };
+            return res.json(userInfo);
         } else {
             return res.json({ status: "Failed" });
         }

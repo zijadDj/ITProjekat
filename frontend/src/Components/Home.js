@@ -80,17 +80,24 @@ export default Home;*/
 function Home() {
     const { id } = useParams();
     const [user, setUser] = useState({});
+    const [bills, setBills] = useState([]);
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchUserAndBills = async () => {
             try {
                 const res = await axios.get(`http://localhost:8081/user/${id}`);
-                setUser(res.data);
+                setUser({
+                    id: res.data.id,
+                    name: res.data.name,
+                    email: res.data.email,
+                    password: res.data.password
+                });
+                setBills(res.data.bills);
             } catch (err) {
                 console.log(err);
             }
         };
-        fetchUser();
+        fetchUserAndBills();
     }, [id]);
 
     return (
@@ -103,6 +110,15 @@ function Home() {
                     <span>{user.password}</span>
                 </div>
             )}
+            <h1>Bills</h1>
+            <div>
+                {bills.map((bill) => (
+                    <div key={bill.id}>
+                        <h2>Amount: {bill.amount}</h2>
+                        <p>Date: {bill.date}</p>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
