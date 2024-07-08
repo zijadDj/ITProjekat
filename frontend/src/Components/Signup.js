@@ -3,60 +3,48 @@ import { Link, useNavigate } from "react-router-dom";
 import Validation from "./SignupValidation";
 import axios from "axios"
 
+
 function Signup() {
     const [values, setValues] = useState({
-        name:'',
-        email:'',
-        password:''
-    })
-
-    const navigate = useNavigate();
-    const [errors, setErrors] = useState({})
+        name: '',
+        email: '',
+        password: '',
+        JMBG: '',
+        address: ''
+    });
 
     const handleInput = (event) => {
-        setValues(prev => ({...prev, [event.target.name]: [event.target.value]}))
-    }
+        setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
+    };
+    
+    const navigate = useNavigate()
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        setErrors(Validation(values));
-        if(errors.name === "" && errors.email === "" && errors.password === ""){
-            axios.post('http://localhost:8081/signup', values)
+        axios.post('http://localhost:8081/signup', values)
             .then(res => {
-                navigate('/')
+                if (res.data.status === "Success") {
+                    navigate('/')
+                } else {
+                    // Handle error
+                }
             })
             .catch(err => console.log(err));
-        }
-    }
+    };
 
-
-    return(
+    return (
         <div>
-            <div>
-                <h2>Sign-up</h2>
-                <form action="" onSubmit={handleSubmit}>
-                    <div>
-                        <label htmlFor="name"><strong>Name</strong></label>
-                        <input type="text" name="name" placeholder="Enter Name" onChange={handleInput}/>
-                        {errors.name && <span className="text-danger">{errors.name}</span>}
-                    </div>
-                    <div>
-                        <label htmlFor="email"><strong>Email</strong></label>
-                        <input type="email" name="email" placeholder="Enter Email" onChange={handleInput} />
-                        {errors.email && <span className="text-danger">{errors.email}</span>}
-                    </div>
-                    <div>
-                        <label htmlFor="password">Password</label>
-                        <input type="password" name="password" placeholder="Enter Password" onChange={handleInput} />
-                        {errors.password && <span className="text-danger">{errors.password}</span>}
-                    </div>
-                    <button type="submit">Sign up</button>
-                    <Link to="/">Login</Link>
-                    
-                </form>
-            </div>
+            <h2>Signup</h2>
+            <form onSubmit={handleSubmit}>
+                <input type="text" name="name" placeholder="Name" onChange={handleInput} required />
+                <input type="email" name="email" placeholder="Email" onChange={handleInput} required />
+                <input type="password" name="password" placeholder="Password" onChange={handleInput} required />
+                <input type="text" name="JMBG" placeholder="JMBG" onChange={handleInput} required pattern="\d{13}" />
+                <input type="text" name="address" placeholder="Address" onChange={handleInput} required />
+                <button type="submit">Signup</button>
+            </form>
         </div>
-    )
+    );
 }
 
-export default Signup
+export default Signup;
