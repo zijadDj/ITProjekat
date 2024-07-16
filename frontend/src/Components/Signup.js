@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Validation from "./SignupValidation";
 import axios from "axios"
 
 
@@ -26,7 +25,7 @@ function Signup() {
                 if (res.data.status === "Success") {
                     navigate('/')
                 } else {
-                    // Handle error
+                    
                 }
             })
             .catch(err => console.log(err));

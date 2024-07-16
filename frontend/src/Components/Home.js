@@ -136,6 +136,7 @@ function Home() {
                         )}
                     </div>
                     <div className="report-section">
+                        <h4>Report a malfunction</h4>
                         <input 
                             type="text" 
                             value={reportText} 

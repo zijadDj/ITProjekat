@@ -107,7 +107,7 @@ app.get('/user/:id', async (req, res) => {
 app.post('/login', (req, res) => {
     const sql = "SELECT * FROM login WHERE email = ? AND password = ?";
     const adminEmail = "admin@gmail.com";
-    const adminPassword = "ADmin121212";
+    const adminPassword = "admin";
 
     db.query(sql, [req.body.email, req.body.password], (err, data) => {
         if (err) {

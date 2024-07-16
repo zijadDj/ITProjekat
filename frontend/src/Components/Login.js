@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import Validation from "./LoginValidation.js";
 import axios from "axios";
 import '../Styles/login.css'
 
@@ -28,6 +27,7 @@ function Login() {
         <div>
             <div className="login-content">
                 <img src={require('../logo.png')} className="logo"/>
+                <h1>Power&Co</h1>
                 <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
                     <input 
