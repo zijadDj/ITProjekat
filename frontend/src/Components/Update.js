@@ -38,13 +38,14 @@ function Update() {
     };
 
     return (
-        <div className='container'>
+        <div className='container-update'>
             {user ? (
                 <div>
                     <h1>Update User: {user.name}</h1>
                     <p>Email: {user.email}</p>
                     <p>JMBG: {user.JMBG}</p>
                     <p>Address: {user.address}</p>
+                    <p>Region: <b>{user.region}</b></p>
                     <div>
                         <select name="month" value={bill.month} onChange={handleInputChange}>
                             <option value="">Select Month</option>

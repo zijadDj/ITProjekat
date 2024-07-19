@@ -9,7 +9,7 @@ html, body {
     align-items: center;
 }
 
-.container {
+.container-update {
     max-width: 600px;
     width: 100%;
     background: #fff;
@@ -17,6 +17,12 @@ html, body {
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     text-align: center;
+    width: 900px;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; 
+    max-height: 80vh;
+    
 }
 
 h1 {

@@ -3,13 +3,14 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import '../Styles/home.css'
 
-
+//RADI PROF
 function Home() {
     const { id } = useParams();
     const [user, setUser] = useState(null);
     const [expandedMonth, setExpandedMonth] = useState(null);
     const [accounts, setAccounts] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [activeTab, setActiveTab] = useState('Users');
     const [reportText, setReportText] = useState('');
     const navigate = useNavigate();
 
@@ -74,7 +75,23 @@ function Home() {
 
     if (isAdmin) {
         return (
-            <div className="container">
+            <div className="container-home-admin">
+                <nav className="navbar">
+                    <ul>
+                        <li 
+                            onClick={() => setActiveTab('Users')} 
+                            className={activeTab === 'Users' ? 'active' : ''}
+                        >
+                            Users
+                        </li>
+                        <li 
+                            onClick={() => setActiveTab('Statistics')} 
+                            className={activeTab === 'Statistics' ? 'active' : ''}
+                        >
+                            Statistics
+                        </li>
+                    </ul>
+                </nav>
                 <h1 className="h1-home">Admin View</h1>
                 <h2>All Accounts</h2>
                 <ul className="admin-view">
@@ -97,14 +114,15 @@ function Home() {
     }
 
     return (
-        <div className="container">
+        <div className="container-home">
             {user ? (
                 <div>
-                    <h1>{user.name}</h1>
+                    <h1>Welcome, {user.name}</h1>
+                    {user.profilePic && <img className="user-picture" src={`http://localhost:8081/uploads/${user.profilePic}`} alt="Profile" />}
                     <p className="user-info">{user.email}</p>
                     <p className="user-info">JMBG: {user.JMBG}</p>
                     <p className="user-info">Address: {user.address}</p>
-                    <div>
+                    <div className="div-bills">
                         {user.bills && user.bills.length > 0 ? (
                             Object.entries(groupBillsByMonth(user.bills)).map(([month, bills]) => (
                                 <div key={month}>
@@ -154,5 +172,7 @@ function Home() {
 }
 
 export default Home;
+
+
 
 
