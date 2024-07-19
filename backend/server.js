@@ -392,6 +392,20 @@ app.post('/report', (req, res) => {
     });
 });
 
+app.get('/user-stats', (req, res) => {
+    const sql = `
+        SELECT region, COUNT(*) as count
+        FROM login
+        GROUP BY region
+    `;
+    db.query(sql, (err, data) => {
+        if (err) {
+            return res.status(500).json(err);
+        }
+        res.json(data);
+    });
+});
+
 app.listen(8081, () => {
     console.log("Server started.");
 });
