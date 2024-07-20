@@ -406,6 +406,30 @@ app.get('/user-stats', (req, res) => {
     });
 });
 
+app.get('/monthly-bill-stats', (req, res) => {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    const promises = months.map(month => {
+        return new Promise((resolve, reject) => {
+            const sql = `SELECT SUM(amount) as total FROM ${mysql.escapeId(month)}`;
+            db.query(sql, (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                resolve({ month, total: result[0].total || 0 });
+            });
+        });
+    });
+
+    Promise.all(promises)
+        .then(results => res.json(results))
+        .catch(err => res.status(500).json(err));
+});
+
+
 app.listen(8081, () => {
     console.log("Server started.");
 });

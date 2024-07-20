@@ -219,7 +219,7 @@ body {
     margin: 20px auto;
     border-radius: 20px;
     background-color: #f7f9fc;
-    width: 1200px;
+    width: 1600px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
     overflow-y: auto; 
     max-height: 80vh;
@@ -398,9 +398,28 @@ th {
     color: white;
     cursor: pointer;
     padding: 5px 10px;
+    transition: 0.5s;
 }
 
 .navbar li:hover, .navbar li.active {
     background-color: #555;
     border-radius: 5px;
 }
+
+.div-stat{
+    display: flex;
+    flex-direction: row;
+    
+}
+
+.div-bar, .div-line{
+    width: 550px;
+    margin: 20px;
+    border: 10px solid rgb(225, 222, 222);
+    border-style: double;
+    border-radius: 18px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+
+}
+
+

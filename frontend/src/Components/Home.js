@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import 'chart.js/auto'; // This is required for Chart.js v3+
 import '../Styles/home.css'
 
@@ -15,6 +15,7 @@ function Home() {
     const [activeTab, setActiveTab] = useState('Users');
     const [reportText, setReportText] = useState('');
     const [regionData, setRegionData] = useState({});
+    const [billData, setBillData] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -67,7 +68,29 @@ function Home() {
                 }
             };
 
+            const fetchBillData = async () => {
+                try {
+                    const res = await axios.get('http://localhost:8081/monthly-bill-stats');
+                    const labels = res.data.map(item => item.month);
+                    const data = res.data.map(item => item.total);
+                    setBillData({
+                        labels,
+                        datasets: [{
+                            label: 'Total Bill Amount by Month',
+                            data,
+                            fill: false,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            tension: 0.1
+                        }]
+                    });
+                } catch (err) {
+                    console.log(err);
+                }
+            };
+
+            
             fetchRegionData();
+            fetchBillData();
         }
     }, [activeTab]);
 
@@ -122,7 +145,7 @@ function Home() {
                     </ul>
                 </nav>
                 <h1 className="h1-home">Admin View</h1>
-                <div>
+                <div className="">
                     {activeTab === 'Users' && ( 
                     <div>
                         <h2>All Accounts</h2>
@@ -143,23 +166,41 @@ function Home() {
                         </ul>
                     </div>
                     )}
-                    {activeTab === 'Statistics' && (
-                        <div>
-                            <h2>Statistics</h2>
-                            {regionData.labels && (
-                                <Bar 
-                                    data={regionData}
-                                    options={{ 
-                                        scales: {
-                                            y: { 
-                                                beginAtZero: true 
+                    <div className="div-stat">
+                        {activeTab === 'Statistics' && (
+                            <div className="div-bar chart">
+                                <h2>Statistics</h2>
+                                {regionData.labels && (
+                                    <Bar 
+                                        data={regionData}
+                                        options={{ 
+                                            scales: {
+                                                y: { 
+                                                    beginAtZero: true 
+                                                } 
                                             } 
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {billData.labels && activeTab==='Statistics' && (  
+                        <div className="div-line chart">
+                            <h2>Bill Data</h2> 
+                            <Line 
+                                data={billData}
+                                options={{ 
+                                    scales: {
+                                        y: { 
+                                            beginAtZero: true 
                                         } 
-                                    }}
-                                />
-                            )}
+                                    } 
+                                }}
+                            />
                         </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         );
