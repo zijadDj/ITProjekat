@@ -429,6 +429,57 @@ app.get('/monthly-bill-stats', (req, res) => {
         .catch(err => res.status(500).json(err));
 });
 
+app.get('/latest-bills', async (req, res) => {
+    try {
+        const sql = `
+            SELECT login.name, all_bills.amount, all_bills.date 
+            FROM (
+                SELECT user_id, amount, date FROM January
+                UNION ALL
+                SELECT user_id, amount, date FROM February
+                UNION ALL
+                SELECT user_id, amount, date FROM March
+                UNION ALL
+                SELECT user_id, amount, date FROM April
+                UNION ALL
+                SELECT user_id, amount, date FROM May
+                UNION ALL
+                SELECT user_id, amount, date FROM June
+                UNION ALL
+                SELECT user_id, amount, date FROM July
+                UNION ALL
+                SELECT user_id, amount, date FROM August
+                UNION ALL
+                SELECT user_id, amount, date FROM September
+                UNION ALL
+                SELECT user_id, amount, date FROM October
+                UNION ALL
+                SELECT user_id, amount, date FROM November
+                UNION ALL
+                SELECT user_id, amount, date FROM December
+            ) AS all_bills
+            JOIN login ON all_bills.user_id = login.id
+            ORDER BY all_bills.date DESC
+            LIMIT 9
+        `;
+        db.query(sql, (err, results) => {
+            if (err) {
+                res.status(500).json({ message: err.message });
+            } else {
+                const bills = results.map(row => ({
+                    id: row.user_id,
+                    user_name: row.name,
+                    amount: row.amount,
+                    date: row.date
+                }));
+                res.json(bills);
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 app.listen(8081, () => {
     console.log("Server started.");

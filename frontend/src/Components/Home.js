@@ -13,9 +13,11 @@ function Home() {
     const [accounts, setAccounts] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [activeTab, setActiveTab] = useState('Users');
+    const [activeTabHome, setActiveTabHome] = useState('Bills')
     const [reportText, setReportText] = useState('');
     const [regionData, setRegionData] = useState({});
     const [billData, setBillData] = useState({});
+    const [latestBills, setLatestBills] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -88,9 +90,19 @@ function Home() {
                 }
             };
 
+            const fetchLatestBills = async () => {
+                try {
+                    const res = await axios.get('http://localhost:8081/latest-bills');
+                    setLatestBills(res.data);
+                } catch (err) {
+                    console.log(err);
+                }
+            };
+
             
             fetchRegionData();
             fetchBillData();
+            fetchLatestBills();
         }
     }, [activeTab]);
 
@@ -201,6 +213,18 @@ function Home() {
                         </div>
                         )}
                     </div>
+                    {activeTab === 'Statistics' && (
+                    <div className="latest-bills">
+                                <h2>Latest Bills</h2>
+                                <ul className="ul-bills">
+                                    {latestBills.map(bill => (
+                                        <li key={bill.id} className="bill-item">
+                                            {bill.user_name} - <p>Amount: {bill.amount}</p> <p>Date: {bill.date}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                    </div>
+                    )}
                 </div>
             </div>
         );
@@ -209,53 +233,65 @@ function Home() {
     return (
         <div className="container-home">
             {user ? (
-                <div>
+                <div className="user-details">
                     <h1>Welcome, {user.name}</h1>
                     {user.profilePic && <img className="user-picture" src={`http://localhost:8081/uploads/${user.profilePic}`} alt="Profile" />}
                     <p className="user-info">{user.email}</p>
                     <p className="user-info">JMBG: {user.JMBG}</p>
                     <p className="user-info">Address: {user.address}</p>
-                    <div className="div-bills">
-                        {user.bills && user.bills.length > 0 ? (
-                            Object.entries(groupBillsByMonth(user.bills)).map(([month, bills]) => (
-                                <div key={month}>
-                                    <h3 onClick={() => toggleMonth(month)} style={{ cursor: "pointer" }}>
-                                        {month}
-                                    </h3>
-                                    {expandedMonth === month && (
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Amount</th>
-                                                    <th>Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {bills.map(bill => (
-                                                    <tr key={bill.id}>
-                                                        <td>{bill.amount}</td>
-                                                        <td>{bill.date}</td>
+
+                    <nav className="navbar navbar-user">
+                    <ul>
+                        <li onClick={() => setActiveTabHome('Bills')} className={activeTabHome === 'Bills' ? 'active' : ''}>Bills</li>
+                        <li onClick={() => setActiveTabHome('Report')} className={activeTabHome === 'Report' ? 'active' : ''}>Report</li>
+                    </ul>
+                </nav>
+
+                    {activeTabHome === 'Bills' && (
+                        <div className="div-bills">
+                            {user.bills && user.bills.length > 0 ? (
+                                Object.entries(groupBillsByMonth(user.bills)).map(([month, bills]) => (
+                                    <div key={month} className="month-bills">
+                                        <h3 className="month" onClick={() => toggleMonth(month)} style={{ cursor: "pointer" }}>
+                                            {month}
+                                        </h3>
+                                        {expandedMonth === month && (
+                                            <table className="bills-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Amount</th>
+                                                        <th>Date</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <p>No bills available.</p>
-                        )}
-                    </div>
-                    <div className="report-section">
-                        <h4>Report a malfunction</h4>
-                        <input 
-                            type="text" 
-                            value={reportText} 
-                            onChange={(e) => setReportText(e.target.value)} 
-                            placeholder="Enter your report" 
-                        />
-                        <button onClick={handleReportSubmit}>Report</button>
-                    </div>
+                                                </thead> 
+                                                <tbody>
+                                                    {bills.map(bill => (
+                                                        <tr key={bill.id}>
+                                                            <td>{bill.amount}</td>
+                                                            <td>{bill.date}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No bills available.</p>
+                            )}
+                        </div>
+                    )}
+                    {activeTabHome === 'Report' && (
+                        <div className="report-section">
+                            <h4>Report a malfunction</h4>
+                            <input 
+                                type="text" 
+                                value={reportText} 
+                                onChange={(e) => setReportText(e.target.value)} 
+                                placeholder="Enter your report" 
+                            />
+                            <button onClick={handleReportSubmit}>Report</button>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <p>Loading...</p>
