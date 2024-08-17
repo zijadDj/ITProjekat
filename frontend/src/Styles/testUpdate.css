@@ -1,0 +1,57 @@
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* User Details */
+.user-details h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.user-details p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.user-details b {
+    font-weight: bold;
+    color: #000;
+}
+
+/* Form Group */
+.form-group {
+    margin-top: 20px;
+}
+
+/* Form Control */
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+/* Button */
+.btn-add-bill {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add-bill:hover {
+    background-color: #0056b3;
+}

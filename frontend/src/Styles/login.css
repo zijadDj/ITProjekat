@@ -52,7 +52,7 @@ input:focus {
 }
 
 
-button {
+/*button {
     width: 100%;
     padding: 12px;
     background-color: #007BFF;
@@ -66,7 +66,7 @@ button {
 
 button:hover {
     background-color: #0056b3;
-}
+}*/
 
 
 .link {

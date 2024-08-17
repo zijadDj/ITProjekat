@@ -50,7 +50,7 @@ select, input {
     font-size: 16px;
 }
 
-button {
+/*button {
     width: 100%;
     padding: 12px;
     background-color: #007BFF;
@@ -68,4 +68,4 @@ button:hover {
 
 .input-number{
     width: 94%;
-}
+}*/

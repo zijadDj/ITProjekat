@@ -1,32 +1,44 @@
-import React, { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import axios from "axios";
-import '../Styles/login.css'
 
-//RADI PROF
+
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.css';
+import '../Styles/testLogin.css'
+
+
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const res = await axios.post("http://localhost:8081/login", { email, password });
-            if (res.data.status === "Success" || res.data.status === "Admin") {
+            setLoading(false);
+            if (res.data.status === "Success") {
+                alert("Login successful!");
+                navigate(`/home/${res.data.id}`);
+            } else if (res.data.status === "Admin") {
+                alert("Admin login successful!");
                 navigate(`/home/${res.data.id}`);
             } else {
-                alert("Login failed");
+                alert("Login failed. Please check your email and password.");
             }
         } catch (err) {
+            setLoading(false);
             console.error(err);
+            alert("An error occurred. Please try again later.");
         }
     };
 
     return (
-        <div>
+        <div className="body-login fade-in">
             <div className="login-content">
-                <img src={require('../logo.png')} className="logo"/>
+                <img src={require('../logo.png')} className="logo" alt="Logo"/>
                 <h1>Power&Co</h1>
                 <h2>Login</h2>
                 <form onSubmit={handleSubmit}>
@@ -44,7 +56,9 @@ function Login() {
                         placeholder="Password" 
                         required 
                     />
-                    <button type="submit">Login</button>
+                    <button className="button-login" type="submit" disabled={loading}>
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
                     <Link to="/signup">Create Account</Link>
                 </form>
             </div>
@@ -54,50 +68,3 @@ function Login() {
 
 export default Login;
 
-/*function Login() {
-    const [values, setValues] = useState({
-        email: '',
-        password: ''
-    });
-
-    const [profilePic, setProfilePic] = useState(null);
-
-    const handleInput = (event) => {
-        setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
-    };
-
-    const navigate = useNavigate();
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        axios.post('http://localhost:8081/login', values)
-            .then(res => {
-                if (res.data.status === "Success") {
-                    setProfilePic(res.data.profilePic); // Set profile picture
-                    navigate('/home', { state: { id: res.data.id, profilePic: res.data.profilePic } });
-                } else if (res.data.status === "Admin") {
-                    setProfilePic(res.data.profilePic); // Set profile picture
-                    navigate('/admin', { state: { id: res.data.id, profilePic: res.data.profilePic } });
-                } else {
-                    console.log("Login failed");
-                }
-            })
-            .catch(err => console.log(err));
-    };
-
-    return (
-        <div>
-            <img src={require('../logo.png')} className="logo"/>
-            <h1>Power&Co</h1>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="email" name="email" placeholder="Email" onChange={handleInput} required />
-                <input type="password" name="password" placeholder="Password" onChange={handleInput} required />
-                <button type="submit">Login</button>
-            </form>
-            {profilePic && <img src={`http://localhost:8081/uploads/${profilePic}`} alt="Profile" />}
-        </div>
-    );
-}
-
-export default Login;*/
