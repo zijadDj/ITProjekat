@@ -1,6 +1,7 @@
 
 
     import React, { useState, useEffect, useCallback } from 'react';
+    import ReactDOM from 'react-dom';
     import { useParams, useNavigate } from 'react-router-dom';
     import axios from 'axios';
     import { Bar, Line } from 'react-chartjs-2';
@@ -31,9 +32,10 @@
         const [reports, setReports] = useState([]); 
         const [unpaidBillsCount, setUnpaidBillsCount] = useState(0);
         const [totalUnpaid, setTotalUnpaid] = useState(0);
-        //const [hoveredBillId, setHoveredBillId] = useState(null);
-        //const [paymentInfo, setPaymentInfo] = useState(null);
-        //const [tooltipVisible, setTooltipVisible] = useState(false);
+        const [hoveredBillId, setHoveredBillId] = useState(null);
+        const [paymentInfo, setPaymentInfo] = useState(null);
+        const [tooltipVisible, setTooltipVisible] = useState(false);
+        const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
         const [hoveredPaymentInfo, setHoveredPaymentInfo] = useState(null);
         const navigate = useNavigate();
         
@@ -285,17 +287,32 @@
             setPaymentInfo(null);
         };*/
 
-        const handleHover = async (billId) => {
+        const handleMouseEnter = async (billId, e) => {
+            console.log('Hovered over bill with ID:', billId); // Check if hovering works
+            setHoveredBillId(billId);
+            setTooltipVisible(true);
+        
             try {
-                const response = await axios.get(`http://localhost:8081/payment-info/${billId}`);
-                setHoveredPaymentInfo(response.data); // Set the payment info when it's fetched
-            } catch (error) {
-                console.error("Failed to fetch payment info:", error);
+                const res = await axios.get(`http://localhost:8081/paid-bill/${billId}`);
+                if (res.data.success) {
+                    setPaymentInfo(res.data.data);
+                    console.log('Fetched payment info:', res.data.data); // Check if data is fetched
+                } else {
+                    console.error('No payment info:', res.data.message);
+                    setPaymentInfo(null);
+                }
+            } catch (err) {
+                console.error('Error fetching payment info:', err);
+                setPaymentInfo(null);
             }
-        };
 
-        const clearHover = () => {
-            setHoveredPaymentInfo(null); // Clear payment info when hover is removed
+            const { clientX, clientY } = e;
+            setTooltipPosition({ top: clientY + window.scrollY + 10, left: clientX + window.scrollX + 10 });
+        };
+    
+        const handleMouseLeave = () => {
+            setTooltipVisible(false);
+            setPaymentInfo(null);
         };
 
     
@@ -314,25 +331,44 @@
                         {activeTab === 'Users' && (
                             <div>
                                 <h2>All Accounts</h2>
-                                <input
-                                type="text"
-                                placeholder="Search by name, email, JMBG, or address"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="search-bar"
-                                />
+                                <div className='div-search'>
+                                    <input
+                                    type="text"
+                                    placeholder="Search by name, email, JMBG, or address"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="search-bar"
+                                    />
+                                </div>
                                 <ul className="admin-view">
                                     {filteredAccounts.map(account => (
                                         <li key={account.user_id} className="account-item">
-                                            <div className="account-info">
-                                                <span className="account-name">{account.name} </span>
-                                                <span className="account-email">{account.email}</span>
-                                                <span className="account-details"><br/>JMBG: {account.JMBG}, <br/>Address: {account.address}</span>
-                                            </div>
-                                            <div className="account-buttons">
-                                                <button className="add-bill-button" onClick={() => navigate(`/update/${account.user_id}`)}>Add bill</button>
-                                                <button className="delete-button" onClick={() => deleteAccount(account.user_id)}>Delete</button>
-                                            </div>
+                                        <div className="account-info">
+                                            <span className="account-name">{account.name}</span><br></br>
+                                            <span className="account-email">{account.email}</span>
+                                            <span className="account-details">
+                                            <br />
+                                            JMBG: {account.JMBG}, <br />Address: {account.address}
+                                            </span>
+                                        </div>
+                                        <div className="account-buttons">
+                                            {account.role === 'admin' ? (
+                                            <p className='p-admin'>Admin</p>  
+                                            ) : (
+                                            <button
+                                                className="add-bill-button"
+                                                onClick={() => navigate(`/update/${account.user_id}`)}
+                                            >
+                                                Add bill
+                                            </button>
+                                            )}
+                                            <button
+                                            className="delete-button"
+                                            onClick={() => deleteAccount(account.user_id)}
+                                            >
+                                            Delete
+                                            </button>
+                                        </div>
                                         </li>
                                     ))}
                                 </ul>
@@ -490,20 +526,39 @@
                                                                     <td>
                                                                         {bill.status === 'paid' ? (
                                                                         <span
-                                                                            style={{ color: 'green', position: 'relative' }}
-                                                                            onMouseEnter={() => handleHover(bill.id)} // Fetch payment info on hover
-                                                                            onMouseLeave={clearHover} // Clear payment info when mouse leaves
+                                                                        style={{ color: 'green', position: 'relative', display: 'inline-block' }}
+                                                                        onMouseEnter={(e) => handleMouseEnter(bill.bill_id, e)} // Pass `e` here
+                                                                        onMouseLeave={handleMouseLeave}
                                                                             
                                                                         >
                                                                             <FaCheckCircle style={{ marginRight: '5px' }} />
                                                                             Paid
 
-                                                                            {hoveredPaymentInfo && (
-                                                                                <div className="payment-tooltip">
-                                                                                    <p><strong>Name of the payer:</strong> {hoveredPaymentInfo.payer_name}</p>
-                                                                                    <p><strong>Date of payment:</strong> {new Date(hoveredPaymentInfo.payment_date).toLocaleDateString()}</p>
-                                                                                    <p><strong>Card number:</strong> ****{hoveredPaymentInfo.card_number.slice(-4)}</p>
-                                                                                </div>
+                                                                            {tooltipVisible &&
+                                                                                ReactDOM.createPortal(
+                                                                                <div
+                                                                                    className="tooltip"
+                                                                                    style={{
+                                                                                    position: 'absolute',
+                                                                                    top: `${tooltipPosition.top}px`,
+                                                                                    left: `${tooltipPosition.left}px`,
+                                                                                    /*backgroundColor: 'yellow',
+                                                                                    padding: '10px',
+                                                                                    zIndex: 1000,
+                                                                                    border: '1px solid black',*/
+                                                                                    }}
+                                                                                >
+                                                                                    {paymentInfo ? (
+                                                                                    <>
+                                                                                        <p><strong>Name of the payer:</strong> {paymentInfo.payer_name}</p>
+                                                                                        <p><strong>Card number:</strong> **** {paymentInfo.card_number.slice(-4)}</p>
+                                                                                        <p><strong>Date of payment:</strong> {new Date(paymentInfo.payment_date).toLocaleDateString()}</p>
+                                                                                    </>
+                                                                                    ) : (
+                                                                                    <p>Loading...</p>
+                                                                                    )}
+                                                                                </div>,
+                                                                                document.body // Render tooltip as a child of document.body
                                                                             )}
                                                                         </span>
                                                                         ) : (

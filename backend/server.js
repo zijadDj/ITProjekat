@@ -93,7 +93,7 @@ app.get('/user/:id', async (req, res) => {
         }
 
         if (data.length > 0 && data[0].role === 'admin') {
-            db.query("SELECT user_id, name, email, JMBG, address, profile_pic, region FROM users", (err, accounts) => {
+            db.query("SELECT user_id, name, email, JMBG, address, role, profile_pic, region FROM users", (err, accounts) => {
                 if (err) {
                     return res.json(err);
                 }
@@ -290,7 +290,7 @@ app.get('/latest-bills', async (req, res) => {
             FROM bills
             JOIN users ON bills.user_id = users.user_id
             ORDER BY bills.billing_date DESC
-            LIMIT 9
+            LIMIT 10
         `;
         db.query(sql, (err, results) => {
             if (err) {
@@ -583,7 +583,7 @@ app.get('/user/:id/reports', async (req, res) => {
     });
 });*/
 
-app.get('/payment-info/:billId', async (req, res) => {
+/*app.get('/payment-info/:billId', async (req, res) => {
     const billId = req.params.billId;
     try {
         const paymentInfo = await db.query(
@@ -595,8 +595,28 @@ app.get('/payment-info/:billId', async (req, res) => {
         console.error(err);
         res.status(500).json({ error: 'Failed to fetch payment info' });
     }
-});
+});*/
 
+app.get('/paid-bill/:bill_id', (req, res) => {
+    const { bill_id } = req.params;
+    console.log('Received bill_id:', bill_id);
+
+    const sql = 'SELECT * FROM paid_bills WHERE bill_id = ?';
+    db.query(sql, [bill_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ success: false, message: 'Server error' });
+        }
+
+        console.log('Query Results:', results);
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'No payment information found' });
+        }
+
+        res.json({ success: true, data: results[0] });
+    });
+});
 
 app.listen(8081, () => {
     console.log("Server started.");

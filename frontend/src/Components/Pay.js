@@ -38,6 +38,7 @@ function Pay() {
     const [cvv, setCvv] = useState('');
     const [nameOnCard, setNameOnCard] = useState('');
     const [error, setError] = useState('');
+    
 
     useEffect(() => {
         const fetchBill = async () => {
@@ -99,7 +100,7 @@ function Pay() {
 
             if (res.data.success) {
                 alert('Payment successful!');
-                navigate('/');
+                navigate(`/`);
             } else {
                 alert('Payment failed. Please try again.');
             }
@@ -133,7 +134,7 @@ function Pay() {
                             <label>Card Number</label>
                             <input 
                                 type="text" 
-                                className="form-control custom-input" 
+                                className="form-control custom-input-cn" 
                                 value={cardNumber} 
                                 onChange={(e) => setCardNumber(e.target.value)} 
                                 placeholder="1234 5678 9012 3456" 
@@ -144,10 +145,10 @@ function Pay() {
                         <div className='ed-cvv-div'>
                             <div className="form-row">
                                 <div className="form-group col-md-6">
-                                    <label>Expiry Date</label>
+                                    <label className='label-ed'>Expiry Date</label>
                                     <input 
                                         type="text" 
-                                        className="form-control custom-input" 
+                                        className="form-control  custom-input-ed " 
                                         value={expiryDate} 
                                         onChange={handleExpiryDateChange} 
                                         placeholder="MM/YY" 
@@ -160,7 +161,7 @@ function Pay() {
                                 <label>CVV</label>
                                 <input 
                                     type="text" 
-                                    className="form-control custom-input" 
+                                    className="form-control custom-input-cvv" 
                                     value={cvv} 
                                     onChange={(e) => setCvv(e.target.value)} 
                                     placeholder="123" 
@@ -173,7 +174,7 @@ function Pay() {
                             <label>Name on Card</label>
                             <input 
                                 type="text" 
-                                className="form-control custom-input" 
+                                className="form-control custom-input-name" 
                                 value={nameOnCard} 
                                 onChange={(e) => setNameOnCard(e.target.value)} 
                                 placeholder="John Doe" 

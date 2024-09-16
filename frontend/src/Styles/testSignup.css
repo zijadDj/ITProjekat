@@ -16,8 +16,7 @@
     border-radius: 1rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 2rem;
-    max-width: 500px;
-    width: 1500px;
+    width: 800px;
     margin: auto;
 }
 
@@ -33,11 +32,11 @@ form {
     width: 100%;
 }
 
-input[type="text"],
+/*input[type="text"],
 input[type="email"],
 input[type="password"],
 select {
-    width: 80%; /* Reduced width */
+    width: 100%; 
     padding: 0.75rem;
     margin-bottom: 1rem;
     border: 1px solid #ced4da;
@@ -47,12 +46,30 @@ select {
     display: block;
     margin-left: auto;
     margin-right: auto;
+}*/
+
+.input-signup{
+    width: 100%; 
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    box-shadow: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    display: block;
+    margin-left: auto;
+    margin-right: auto; 
 }
 
-input[type="text"]:focus,
+/*input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
 select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}*/
+
+.input-signup:focus{
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
@@ -60,33 +77,38 @@ select:focus {
 /* Stylish file input */
 .file-input-container {
     position: relative;
-    width: 80%; /* Reduced width */
+    width: 150px; /* Set the width of the circle */
+    height: 150px; /* Set the height of the circle */
     margin: 0 auto 1rem;
+    
 }
 
 .file-input {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    box-shadow: none;
-    opacity: 0;
-    position: relative;
-    z-index: 2;
-}
-
-.file-label {
+    height: 100%;
+    opacity: 0; /* Hide the actual file input */
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    padding: 0.75rem;
+    z-index: 2;
+    cursor: pointer; /* Make it clickable */
+    
+}
+
+.file-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 150px; /* Ensure it's always a circle */
+    border-radius: 50%; /* Make the label a circle */
     background-color: #007bff;
     color: white;
     text-align: center;
-    border-radius: 0.25rem;
     cursor: pointer;
+    position: relative;
     transition: background-color 0.15s, box-shadow 0.15s;
+    overflow: hidden; /* Hide overflow to ensure the circle shape */
     z-index: 1;
 }
 
@@ -95,6 +117,23 @@ select:focus {
     box-shadow: 0 5px 10px rgba(0, 123, 255, 0.2);
 }
 
+.file-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensure the image covers the circle */
+    border-radius: 50%;
+}
+
+.plus-sign {
+    font-size: 2rem;
+}
+
+.file-text {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #6c757d; /* Optional: Gray color to match the theme */
+    text-align: center;
+}
 .button-submit {
     width: 80%; /* Reduced width */
     padding: 0.75rem;
@@ -107,8 +146,9 @@ select:focus {
     transition: background-color 0.15s, box-shadow 0.15s;
     cursor: pointer;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 2rem auto 0;
+    /*margin-left: auto;
+    margin-right: auto;*/
 }
 
 .button-submit:hover {
@@ -160,4 +200,15 @@ select:focus {
 .email-error-float.hidden {
     opacity: 0;
     visibility: hidden;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.form-column-left,
+.form-column-right {
+    width: 48%; /* Adjust width to give some spacing between columns */
 }
