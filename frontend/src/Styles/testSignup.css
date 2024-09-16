@@ -120,3 +120,44 @@ select:focus {
     outline: none;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
+
+.email-container {
+    position: relative;
+}
+
+.email-error-float {
+    position: absolute;
+    top: 50%;
+    right: -150px; /* Adjust the value to fit your design */
+    transform: translateY(-50%);
+    background-color: rgba(255, 0, 0, 0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 1;
+    pointer-events: none; /* Prevent interaction with the error message */
+}
+
+.email-error-float::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10px;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent rgba(255, 0, 0, 0.8) transparent transparent;
+}
+
+/* Optional animation: if you want to animate it in/out */
+.email-container input:invalid + .email-error-float {
+    opacity: 1;
+    visibility: visible;
+}
+
+.email-error-float.hidden {
+    opacity: 0;
+    visibility: hidden;
+}

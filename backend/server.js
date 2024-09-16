@@ -362,7 +362,7 @@ app.get('/bill/:id', (req, res) => {
     });
 });
 
-app.post('/pay/:id', async (req, res) => {
+/*app.post('/pay/:id', async (req, res) => {
     const { id } = req.params;
     const { cardNumber, expiryDate, cvv } = req.body;
 
@@ -424,6 +424,87 @@ app.post('/pay/:id', async (req, res) => {
         console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
+});*/
+
+app.post('/pay/:id', async (req, res) => {
+    const { id } = req.params;
+    const { cardNumber, expiryDate, cvv, nameOnCard } = req.body;
+
+    // Basic validation
+    const cardNumberRegex = /^[0-9]{16}$/;
+    const expiryDateRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+    const cvvRegex = /^[0-9]{3}$/;
+
+    if (!cardNumberRegex.test(cardNumber)) {
+        return res.status(400).json({ success: false, message: 'Invalid card number' });
+    }
+
+    if (!expiryDateRegex.test(expiryDate)) {
+        return res.status(400).json({ success: false, message: 'Invalid expiry date format' });
+    }
+
+    if (!cvvRegex.test(cvv)) {
+        return res.status(400).json({ success: false, message: 'Invalid CVV' });
+    }
+
+    // Check if the expiry date is in the past
+    const [month, year] = expiryDate.split('/');
+    const expiryDateObject = new Date(`20${year}`, month - 1);
+
+    if (expiryDateObject < new Date()) {
+        return res.status(400).json({ success: false, message: 'Card expiry date is in the past' });
+    }
+
+    try {
+        // Fetch the bill by ID
+        const sqlGetBill = 'SELECT * FROM Bills WHERE bill_id = ?';
+        db.query(sqlGetBill, [id], (err, results) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ success: false, message: 'Server error' });
+            }
+
+            const bill = results[0];
+            if (!bill) {
+                return res.status(404).json({ success: false, message: 'Bill not found' });
+            }
+
+            if (bill.status === 'paid') {
+                return res.status(400).json({ success: false, message: 'Bill is already paid' });
+            }
+
+            // Update the bill status to 'paid'
+            const sqlUpdateBill = 'UPDATE Bills SET status = ? WHERE bill_id = ?';
+            db.query(sqlUpdateBill, ['paid', id], (err, updateResult) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({ success: false, message: 'Server error' });
+                }
+
+                // Now that the bill is marked as paid, store payment information in the paid_bills table
+                const sqlInsertPaidBill = `
+                    INSERT INTO paid_bills (bill_id, payer_name, card_number, payment_date)
+                    VALUES (?, ?, ?, NOW())
+                `;
+
+                // Only store the last 4 digits of the card number for security purposes
+                const cardLast4 = cardNumber.slice(-4);
+
+                db.query(sqlInsertPaidBill, [id, nameOnCard, cardLast4], (err, insertResult) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({ success: false, message: 'Server error when inserting into paid_bills' });
+                    }
+
+                    // Successfully paid and stored info
+                    res.json({ success: true, message: 'Payment successful and recorded.' });
+                });
+            });
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
 });
 
 app.get('/reports', (req, res) => {
@@ -476,6 +557,43 @@ app.get('/user/:id/reports', async (req, res) => {
     } catch (error) {
         console.error('Unexpected error:', error);
         res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+// Fetch paid bill details by bill_id
+/*app.get('/paid-bill/:bill_id', (req, res) => {
+    const { bill_id } = req.params;
+    console.log('Received bill_id:', bill_id);
+
+    const sql = 'SELECT * FROM paid_bills WHERE bill_id = ?';
+    db.query(sql, [bill_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ success: false, message: 'Server error' });
+        }
+
+        console.log('Query Results:', results); // Log the results to see what's returned
+
+        if (results.length === 0) {
+            return res.status(404).json({ success: false, message: 'No payment information found' });
+        }
+
+        res.json({ success: true, data: results[0] });
+    });
+});*/
+
+app.get('/payment-info/:billId', async (req, res) => {
+    const billId = req.params.billId;
+    try {
+        const paymentInfo = await db.query(
+            'SELECT payer_name, card_number, payment_date FROM paid_bills WHERE bill_id = $1',
+            [billId]
+        );
+        res.json(paymentInfo.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch payment info' });
     }
 });
 

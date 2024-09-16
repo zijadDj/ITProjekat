@@ -152,12 +152,12 @@ function Update() {
     return (
         <div className='container'>
             {user ? (
-                <div>
-                    <h1>Update User: {user.name}</h1>
-                    <p>Email: {user.email}</p>
-                    <p>JMBG: {user.JMBG}</p>
-                    <p>Address: {user.address}</p>
-                    <p>Region: <b>{user.region}</b></p>
+                <div className='user-details'>
+                    <h1 className='update-h1'>Update User: {user.name}</h1>
+                    <p className='update-p'>Email: {user.email}</p>
+                    <p className='update-p'>JMBG: {user.JMBG}</p>
+                    <p className='update-p'>Address: {user.address}</p>
+                    <p className='update-p'>Region: <b>{user.region}</b></p>
                     <div className="form-group">
                         <select name="month" value={bill.month} onChange={handleInputChange} className="form-control mb-2">
                             <option value="">Select Month</option>
@@ -215,5 +215,5 @@ function Update() {
         </div>
     );
 }
-
 export default Update;
+

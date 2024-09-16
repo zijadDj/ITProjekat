@@ -16,14 +16,29 @@ function Signup() {
         phone: ''
     });
 
+    const [emailError, setEmailError] = useState(false);
+
     const handleInput = (event) => {
         setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
     };
     
     const navigate = useNavigate();
 
+    const validateEmail = (email) => {
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
+    };
+
     const handleSubmit = (event) => {
         event.preventDefault();
+
+        if (!validateEmail(values.email)) {
+            setEmailError(true); // Show floating error message
+            return;
+        } else {
+            setEmailError(false); // Clear error if email is valid
+        }
+
         const formData = new FormData();
         for (const key in values) {
             formData.append(key, values[key]);
@@ -53,7 +68,20 @@ function Signup() {
                 <h2>Signup</h2>
                 <form onSubmit={handleSubmit}>
                     <input type="text" name="name" placeholder="Name" onChange={handleInput} required />
-                    <input type="email" name="email" placeholder="Email" onChange={handleInput} required />
+                    <div className="email-container">
+                        <input 
+                            type="email" 
+                            name="email" 
+                            placeholder="Email" 
+                            onChange={handleInput} 
+                            required 
+                        />
+                        {emailError && (
+                            <div className="email-error-float">
+                                Invalid email address!
+                            </div>
+                        )}
+                    </div>
                     <input type="password" name="password" placeholder="Password" onChange={handleInput} required />
                     <input type="text" name="JMBG" placeholder="JMBG" onChange={handleInput} required pattern="\d{13}" />
                     <input type="text" name="address" placeholder="Address" onChange={handleInput} required />

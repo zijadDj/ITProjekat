@@ -16,7 +16,8 @@
     function Home() {
         const { id } = useParams();
         const [user, setUser] = useState(null);
-        const [expandedMonth, setExpandedMonth] = useState(null);
+        //const [expandedMonth, setExpandedMonth] = useState(null);
+        const [expandedMonth, setExpandedMonth] = useState([]);
         //const [accounts, setAccounts] = useState(null);
         const [accounts, setAccounts] = useState([]);
         const [isAdmin, setIsAdmin] = useState(false);
@@ -27,7 +28,13 @@
         const [billData, setBillData] = useState({ labels: [], datasets: [] });
         const [latestBills, setLatestBills] = useState([]);
         const [searchQuery, setSearchQuery] = useState('');
-        const [reports, setReports] = useState([]);  // State to store reports
+        const [reports, setReports] = useState([]); 
+        const [unpaidBillsCount, setUnpaidBillsCount] = useState(0);
+        const [totalUnpaid, setTotalUnpaid] = useState(0);
+        //const [hoveredBillId, setHoveredBillId] = useState(null);
+        //const [paymentInfo, setPaymentInfo] = useState(null);
+        //const [tooltipVisible, setTooltipVisible] = useState(false);
+        const [hoveredPaymentInfo, setHoveredPaymentInfo] = useState(null);
         const navigate = useNavigate();
         
 
@@ -161,9 +168,24 @@
             }
         }, [activeTab]);
     
-        const toggleMonth = (month) => {
+        /*const toggleMonth = (month) => {
             setExpandedMonth(expandedMonth === month ? null : month);
+        };*/
+
+        const toggleMonth = (month) => {
+            if (expandedMonth.includes(month)) {
+                setExpandedMonth(expandedMonth.filter(m => m !== month)); // Collapse the month
+            } else {
+                setExpandedMonth([...expandedMonth, month]); // Expand the month
+            }
         };
+
+        useEffect(() => {
+            if (user && user.bills) {
+                const months = Object.keys(groupBillsByMonth(user.bills));
+                setExpandedMonth(months); // Expand all months by default
+            }
+        }, [user]);
     
         const groupBillsByMonth = (bills) => {
             const months = [
@@ -224,6 +246,57 @@
                 fetchUserReports();
             }
         }, [activeTabHome, id]);
+
+        useEffect(() => {
+            if (user && user.bills) {
+                const unpaidCount = user.bills.filter(bill => bill.status !== 'paid').length;
+                setUnpaidBillsCount(unpaidCount);
+            }
+        }, [user]);
+        
+        useEffect(() => {
+            if (user && user.bills) {
+                const unpaidBills = user.bills.filter(bill => bill.status !== 'paid');
+                const unpaidSum = unpaidBills.reduce((acc, bill) => acc + bill.total_amount, 0);
+                setTotalUnpaid(unpaidSum);
+            }
+        }, [user]);
+
+        /*const handleMouseEnter = async (billId) => {
+            console.log('Hovered Bill ID:', billId); // Confirm billId is correct
+            setHoveredBillId(billId);
+            setTooltipVisible(true);
+        
+            try {
+                const res = await axios.get(`http://localhost:8081/paid-bill/${billId}`);
+                if (res.data.success) {
+                    setPaymentInfo(res.data.data);
+                } else {
+                    console.log('Error fetching payment info:', res.data.message);
+                }
+            } catch (err) {
+                console.error('Error fetching payment info:', err);
+            }
+        };
+
+        const handleMouseLeave = () => {
+            setHoveredBillId(null);
+            setTooltipVisible(false);
+            setPaymentInfo(null);
+        };*/
+
+        const handleHover = async (billId) => {
+            try {
+                const response = await axios.get(`http://localhost:8081/payment-info/${billId}`);
+                setHoveredPaymentInfo(response.data); // Set the payment info when it's fetched
+            } catch (error) {
+                console.error("Failed to fetch payment info:", error);
+            }
+        };
+
+        const clearHover = () => {
+            setHoveredPaymentInfo(null); // Clear payment info when hover is removed
+        };
 
     
         if (isAdmin) {
@@ -384,6 +457,13 @@
                                     <li onClick={() => setActiveTabHome('Report')} className={activeTabHome === 'Report' ? 'active' : ''}>Report</li>
                                 </ul>
                             </nav>
+
+                            {unpaidBillsCount >= 3 && (
+                                <div className="warning-message">
+                                    <h3>Your account is blocked due to unpaid bills.</h3>
+                                    <p>Please contact your local branch of Powerz to get unblocked.</p>
+                                </div>
+                            )}
         
                             {activeTabHome === 'Bills' && (
                                 <div className="div-bills">
@@ -393,7 +473,7 @@
                                                 <h3 className="month" onClick={() => toggleMonth(month)} style={{ cursor: "pointer" }}>
                                                     {month}
                                                 </h3>
-                                                {expandedMonth === month && (
+                                                {expandedMonth.includes(month) && (
                                                     <table className="bills-table fade-in">
                                                         <thead>
                                                             <tr>
@@ -401,7 +481,7 @@
                                                                 <th>Date</th>
                                                                 <th>Status</th>
                                                             </tr>
-                                                        </thead> 
+                                                        </thead>
                                                         <tbody>
                                                             {bills.map(bill => (
                                                                 <tr key={bill.id}>
@@ -409,17 +489,31 @@
                                                                     <td>{new Date(bill.billing_date).toLocaleDateString()}</td>
                                                                     <td>
                                                                         {bill.status === 'paid' ? (
-                                                                            <span style={{ color: 'green' }}>
-                                                                                <FaCheckCircle style={{ marginRight: '5px' }} />
-                                                                                Paid
-                                                                            </span>
+                                                                        <span
+                                                                            style={{ color: 'green', position: 'relative' }}
+                                                                            onMouseEnter={() => handleHover(bill.id)} // Fetch payment info on hover
+                                                                            onMouseLeave={clearHover} // Clear payment info when mouse leaves
+                                                                            
+                                                                        >
+                                                                            <FaCheckCircle style={{ marginRight: '5px' }} />
+                                                                            Paid
+
+                                                                            {hoveredPaymentInfo && (
+                                                                                <div className="payment-tooltip">
+                                                                                    <p><strong>Name of the payer:</strong> {hoveredPaymentInfo.payer_name}</p>
+                                                                                    <p><strong>Date of payment:</strong> {new Date(hoveredPaymentInfo.payment_date).toLocaleDateString()}</p>
+                                                                                    <p><strong>Card number:</strong> ****{hoveredPaymentInfo.card_number.slice(-4)}</p>
+                                                                                </div>
+                                                                            )}
+                                                                        </span>
                                                                         ) : (
                                                                             <span style={{ color: 'red' }}>
                                                                                 Unpaid
                                                                                 <button 
-                                                                                     className="pay-button btn btn-danger" 
-                                                                                     onClick={() => navigate(`/pay/${bill.bill_id}`)}
-                                                                                    style={{ marginLeft: '10px' }}
+                                                                                    className="pay-button btn btn-danger" 
+                                                                                    onClick={() => navigate(`/pay/${bill.bill_id}`)}
+                                                                                    style={{ marginLeft: '10px', backgroundColor: unpaidBillsCount >= 3 ? 'gray' : '', cursor: unpaidBillsCount >= 3 ? 'not-allowed' : 'pointer' }}
+                                                                                    disabled={unpaidBillsCount >= 3}
                                                                                 >
                                                                                     Pay the bill
                                                                                 </button>
@@ -436,8 +530,17 @@
                                     ) : (
                                         <p>No bills available.</p>
                                     )}
+
+                                    {user.bills && user.bills.length > 0 && (
+                                        <div className="total-unpaid">
+                                            <h4>You owe: {totalUnpaid.toFixed(2)} EUR</h4>
+                                        </div>
+                                    )}
                                 </div>
                             )}
+
+                            
+
                             {activeTabHome === 'Report' && (
                                 <div className="report-section">
                                     <h4>Report a malfunction</h4>
@@ -466,7 +569,17 @@
                                                         <td>{report.report_id}</td>
                                                         <td>{new Date(report.report_date).toLocaleDateString()}</td>
                                                         <td>{report.report_text}</td>
-                                                        <td>{report.status}</td>
+                                                        <td>
+                                                            <span
+                                                                className={
+                                                                    report.status === 'open' ? 'status-open' :
+                                                                    report.status === 'in progress' ? 'status-in-progress' :
+                                                                    'status-closed'
+                                                                }
+                                                            >
+                                                                {report.status}
+                                                            </span>
+                                                        </td>
                                                     </tr>
                                                 ))}
                                             </tbody>

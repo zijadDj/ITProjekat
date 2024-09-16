@@ -109,6 +109,14 @@ function Pay() {
         }
     };
 
+    const handleExpiryDateChange = (e) => {
+        let input = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+        if (input.length >= 3) {
+            input = input.slice(0, 2) + '/' + input.slice(2); // Add '/' after the second digit
+        }
+        setExpiryDate(input);
+    };
+
     return (
         <div className="pay-container mt-2 mb-2 fade-in-delayed">
             {bill ? (
@@ -141,7 +149,7 @@ function Pay() {
                                         type="text" 
                                         className="form-control custom-input" 
                                         value={expiryDate} 
-                                        onChange={(e) => setExpiryDate(e.target.value)} 
+                                        onChange={handleExpiryDateChange} 
                                         placeholder="MM/YY" 
                                         maxLength="5" 
                                         required 

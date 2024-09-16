@@ -1,5 +1,5 @@
-/* Container */
-.container {
+
+/*.container {
     max-width: 800px;
     margin: 20px auto;
     background-color: #ffffff;
@@ -8,7 +8,7 @@
     border-radius: 10px;
 }
 
-/* User Details */
+
 .user-details h1 {
     font-size: 2rem;
     margin-bottom: 20px;
@@ -26,12 +26,12 @@
     color: #000;
 }
 
-/* Form Group */
+
 .form-group {
     margin-top: 20px;
 }
 
-/* Form Control */
+
 .form-control {
     border-radius: 5px;
     padding: 10px;
@@ -40,7 +40,7 @@
     font-size: 1rem;
 }
 
-/* Button */
+
 .btn-add-bill {
     background-color: #007bff;
     border: none;
@@ -54,4 +54,108 @@
 
 .btn-add-bill:hover {
     background-color: #0056b3;
+}*/
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 25px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    font-family: 'Roboto', sans-serif;
 }
+
+/* User Details */
+.update-h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #007bff;
+    font-weight: 700;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007bff;
+}
+
+.update-p {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    text-align: left;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/*.user-details p span {
+    font-weight: bold;
+    color: #007bff;
+    margin-right: 10px;
+    font-size: 1.1rem;
+}*/
+
+/* Form Group */
+.form-group {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+/* Form Control */
+.form-control {
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    font-size: 1.1rem;
+    background-color: #fafafa;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Button */
+.btn-add-bill {
+    background-color: #007bff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-add-bill:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .update-h1 {
+        font-size: 2rem;
+    }
+
+    .update-p {
+        font-size: 1rem;
+    }
+
+    .form-control {
+        font-size: 1rem;
+    }
+
+    .btn-add-bill {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
