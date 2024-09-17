@@ -114,7 +114,7 @@ function Update() {
     const { id } = useParams();
     const [user, setUser] = useState(null);
     const [bill, setBill] = useState({ month: '', amount: '', consumptionId: '', billingDate: '', dueDate: '' });
-
+    const [kWhAmount, setKWhAmount] = useState('');
     useEffect(() => {
         const fetchUserData = async () => {
             try {
@@ -149,6 +149,18 @@ function Update() {
         }
     };
 
+    const handleKWhChange = (e) => {
+        const value = e.target.value;
+        setKWhAmount(value);
+
+        // Calculate amount in euros and update bill amount
+        const calculatedAmount = (value * 0.2).toFixed(2); // Multiply by 0.2 and format to 2 decimals
+        setBill(prevBill => ({
+            ...prevBill,
+            amount: calculatedAmount
+        }));
+    };
+
     return (
         <div className='container'>
             {user ? (
@@ -177,10 +189,19 @@ function Update() {
                         <input 
                             className='form-control mb-2'
                             type="number" 
+                            name="kWhAmount" 
+                            placeholder="Amount of kWh" 
+                            value={kWhAmount} 
+                            onChange={handleKWhChange} 
+                        />
+                        <input 
+                            className='form-control mb-2'
+                            type="number" 
                             name="amount" 
-                            placeholder="Amount" 
+                            placeholder="Amount (euro)" 
                             value={bill.amount} 
-                            onChange={handleInputChange} 
+                            onChange={handleInputChange}
+                            readOnly 
                         />
                         <input 
                             className='form-control mb-2'
